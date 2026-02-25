@@ -1,0 +1,53 @@
+#+title: This is a guide on how to use ed, the default UNIX editor!
+#+author: Lua T. Andrade
+
+* Ed is a line editor
+- It works by appending/deleting lines!
+- It is incredibly powerful even then!
+- It is a very old text editor, actually used in times of the teletype!
+- UNIX was actually written using ed (to some extent)!
+  
+* Basic Usage
+
+** Running ed
+
+ed -p ">" [name of file to edit or create]
+
+# NOTE -p ">" is optimal but having a little prompt line is nice :D
+
+
+** Printing stuff to screen
+
+N,Mn
+
+prints all lines, and their numbers from range N to M
+
+# IMPORTANT! if you do ,n it will print everything for you! Also
+# $ represents the end of the file!!
+
+n: changes to nth line
+np: prints nth line
+
+  
+** Editing lines
+- nd: deletes nth line
+- a: appends under current line
+- i: prepends above current line
+- w: writes to file (save)
+- q: quits ed
+  
+# ATTENTION: for i and a, after writing the line, you will press ENTER and then . and then ENTER.
+# That way you execute the action. This seems strange,
+# but it is a way to actually stop writing if you have a long paragraph.
+
+
+** regexp
+- this is where ed shines the most!
+- you can use the prompt for regexp!
+
+*** Examples
+- g/lala/p: will look for string "lala" in text and print lines where it appears
+- s/lala/lolo: will substitute "lala" with "lolo"
+
+*** TODO LEARN REGEXP!!!!
+

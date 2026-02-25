@@ -1,0 +1,10 @@
+#+title: INSTRUCTIONS FOR QEMU USE
+
+* Creates a disk image of name and X size
+qemu-img create -f qcow2 name.qcow2 XG
+
+* Boots system with cdrom and uses disk image as storage (hard drive)
+qemu-system-x86_64 -m X -nic user -boot once=d -cdrom X.iso -drive file=name.qcow2 -display gtk -enable-kvm
+
+* Boots system with no cdrom
+qemu-system-x86_64 -m X -nic user -drive file=name.qcow2

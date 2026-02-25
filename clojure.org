@@ -1,0 +1,220 @@
+#+title: CLOJURE DOC FOR MYSELF
+
+*INSANE PURE FUNCTIONAL PROGRAMMING LISP TIME!!!!!1*
+[X] Imutability 
+[X] No side effects
+
+# NOTE Always remember to read the docs!!
+[[https://clojuredocs.org/]]
+[[https://clojure.org/reference/reader
+]]
+* Basics
+Clojures use the REPL system, similar to all lisp dialects.
+
+** Usage of REPL
+Run the REPL on terminal: clj or clojure.
+You can run all basic evaluations here!
+
+** Emacs integration
+You should use "cider" to use the REPL inside of Emacs for fast evaluation and docs.
+** File ending
+Files for clojure end in .clj!!
+** Comments
+;;
+or
+(comment ...)
+
+* Primitive Types
+Mostly the same primitive types from the java lang!!
+
+** Clojure specific
+nil -> no value
+'SOMETHING -> does not evaluate the SOMETHING
+
+** def
+This defines var for a global scope!
+(def x "abc")
+# NOTE to define a single character, use the \
+
+** let
+This defines var for a local scope! Use it to define vars inside functions (good practice)!
+(let x "abc")
+
+* Clojure List Data Structures
+
+** Referential transparency
+Data stays the same across evaluations!
+Data points directly to the specific data.
+
+** Polymorphic functions for list data types
+Clojure has polymorphism!!
+They are all collections, but only lists are sequences.
+All functions work for all of them!!
+
+
+(conj list elem)
+(first list)
+(last list)
+(rest list)
+(second list)
+(get list position/key)
+...
+
+** Vector
+List type that is indexed, works as a queue.
+
+(vector 1 2 3)
+[1 2 3]
+
+** List
+List type that is the basic lisp list, works as a stack.
+
+(list 1 2 3)
+'(1 2 3)
+# NOTE be careful about the ', otherwise it would evaluate the first element as a function.
+
+** Set
+List type that can't have repeated elements
+
+(set [1 2 3 3])
+# NOTE this will turn the vector into a 3 element set without repetition.
+#{1 2 3}
+
+** Hash-map
+Just like a dictionary in python, key and value pairs.
+
+(hash-map :a 1 :b 2 :c 3)
+{:a 1, :b 2}
+(hash-map :a [1 2 {:b 2}]) <-- complex stuff like this is possible!
+# NOTE commas are ALWAYS ignored in clojure
+
+*** Functions for Hash-maps
+(get map :key) --> get value for key
+(get-in map [:nested-key :key] --> same as (get (get map :nested-key) :key)
+(assoc map :new-key new-value) --> add key
+(assoc-in ...) --> add key nested
+(dissoc map :key) --> remove key
+
+* Functions
+** Anonymous function
+
+#+BEGIN_SRC clojure
+(fn
+  [..args..]
+  (..exp..))
+#+END_SRC
+
+Return value will always be the last thing in function!
+
+** Defining functions
+
+#+BEGIN_SRC clojure
+    (defn name
+      "..docs.."
+      [..args..]
+      (..exp..))
+#+END_SRC
+
+It's possible to define a function to do many things for specific conditions! (multi-arity)
+
+#+BEGIN_SRC clojure
+     (defn name
+       ([..args..]
+        (..exp..))
+       ([..other args..]
+        (..exp..))) ;; etc
+#+END_SRC
+
+For any amount of arguments... (rest)
+
+#+BEGIN_SRC clojure
+  (defn name
+    [& x]
+    (..exp..))
+#+END_SRC
+
+*** Naming conventions
+
+'name? --> for boolean functions
+'a->b --> for transformation functions
+'name! --> non-pure functions w/ side affects
+
+* Control flow
+** If conditional
+
+#+BEGIN_SRC clojure
+  (if (..cond..)
+  ..true..
+  ..false..)
+#+END_SRC
+
+** When conditional
+
+Basically when you don't care about the false result (it will return nil)
+
+#+BEGIN_SRC clojure
+  (when (..cond..)
+    ..result..)
+#+END_SRC
+
+** TODO Cond conditional
+** TODO Case conditional
+* Loops
+The functional programming freaks prefer recursion!! Do it with recursion!!
+Clojure has lazy evaluation just like haskell.
+
+# NOTE there are other ways though...
+
+* Higher Order Functions
+Doing weird stuff with functions.
+# NOTE lambda: #(..exp..)
+** Return Value
+*** map
+(map (function) coll)
+Will do the thing to the list and return the new list.
+
+*** filter
+(filter (conditional-function) coll)
+Will remove the elements that don't evaluate true and return new list.
+
+*** TODO reduce
+*** TODO some
+** Return Function
+You can do "incomplete" functions.
+
+#+BEGIN_SRC clojure
+  (defn sum-with [x]
+    (fn [y]
+      (+ x y)))
+
+  (def add-to-3
+    (sum-with [3]))
+  ;; returns function waiting for argument to sum with 3
+
+  (add-to-3 4)
+  ;; this returns the sum
+#+END_SRC
+
+* Keeping track of state changes
+If the imutability principle is murdered...
+
+(atom ..arg..) --> data type at memory adress and value inside
+# Kinda like a pointer? Not so sure...
+
+* Organizing shtuff
+Creating .edn files. They are a map!
+
+** TODO deps.edn file
+[[https://clojure.org/reference/deps_edn]]
+
+** TODO Namespaces
+** Require and import
+
+#+BEGIN_SRC clojure
+      (ns namespace
+        (:require [namespace :as alias]
+                  [clojure.lib :as alias2])
+        ;; clojure stuff
+        (:import  [java.javalib method-from-java])
+        ;; for java methods
+#+END_SRC
