@@ -24,6 +24,15 @@ Files for clojure end in .clj!!
 or
 (comment ...)
 
+** Denesting expressions
+You can make code more readable by denesting using the --> macro.
+
+#+BEGIN_SRC clojure
+    (reduce + (map inc (range 10)))
+    --> (range 10) (map inc) (reduce +)
+    ;; both will give the same result!
+#+END_SRC
+
 * Primitive Types
 Mostly the same primitive types from the java lang!!
 
@@ -211,10 +220,45 @@ Creating .edn files. They are a map!
 ** Require and import
 
 #+BEGIN_SRC clojure
-      (ns namespace
-        (:require [namespace :as alias]
-                  [clojure.lib :as alias2])
-        ;; clojure stuff
-        (:import  [java.javalib method-from-java])
-        ;; for java methods
+  (ns namespace
+    (:require [namespace :as alias]
+              [clojure.lib :as alias2])
+    ;; clojure stuff
+    
+    (:import  [java.javalib method-from-java])
+    ;; for java methods
 #+END_SRC
+
+* Multimethods
+Muiltimethods are useful to create polymorphic functions!!
+
+#+BEGIN_SRC clojure
+  (defmulti area :shape)
+  ;; this is the "base" for the other functions
+    
+  (defmethod area :circle [{:keys [r]}]
+    (* Math/PI r r))
+
+  (defmethod area :rectangle [{:keys [l w]}]
+    (* l w))
+
+  (defmethod area :default [shape]
+  (throw (Exception. (str "unrecognized shape: " shape))))
+#+END_SRC
+
+* Loop and Recur
+
+** Recur
+This is useful for recursiveness. Avoids stack overflow. Tail Call Optimization.
+
+#+BEGIN_SRC clojure
+  (defn sum-coll
+    [result coll]
+    (if (seq coll)
+      (recur (+ result (first coll))
+             (rest coll))
+      result))
+  ;; recur is in the place where the function would be called again
+#+END_SRC
+
+** TODO Loop
