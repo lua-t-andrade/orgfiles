@@ -262,3 +262,57 @@ This is useful for recursiveness. Avoids stack overflow. Tail Call Optimization.
 #+END_SRC
 
 ** TODO Loop
+
+* Protocols and records
+Very useful to facilitate OOP implementations. Protocols defines the object, records define the concrete version of those objects.
+
+#+BEGIN_SRC clojure
+  (defprotocol Shape
+    (area [s] "Calculate area of shape")
+    (perimeter [s] "Calculate perimeter of shape"))
+
+  (defrecord Rectangle [length width]
+    Shape ;; "of type Shape"
+    (area [this] (* length width))
+    (perimeter [this] (+ (* 2 length)
+                         (* 2 width))))
+
+  (area (->Rectangle 2 4))
+  ;; The "->" creates instance of the Rectangle
+  ;; => 8
+  
+#+END_SRC
+
+* Extend bult-in types
+If you want to extend the built-in types to do new functions for you.
+
+#+BEGIN_SRC clojure
+  (defprotocol Character
+    ;; protocol with the function signatures
+    "Represents the name of the character"
+    (first-name [this])
+    (last-name [this]))
+
+  (extend-type String ;; since we want to extend the java.lang.String class
+    Person
+    (first-name [s] (first (str/split s #" ")))
+    (last-name [s] (second (str/split s #" "))))
+
+  (first-name "jane doe")
+  ;; => "jane"
+#+END_SRC
+
+You could also do this if you already have the functions with the extend function.
+
+#+BEGIN_SRC clojure
+    (defn first-word [s]
+      (first (str/split s #" ")))
+
+    (defn second-word [s]
+      (second (str/splt s #" ")))
+
+    (extend String
+      Person
+      {:first-name first-word
+       :last-name second-word}
+#+END_SRC
