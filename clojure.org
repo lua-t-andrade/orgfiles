@@ -1,13 +1,14 @@
 #+title: CLOJURE DOC FOR MYSELF
 
 *INSANE PURE FUNCTIONAL PROGRAMMING LISP TIME!!!!!1*
-[X] Imutability 
-[X] No side effects
+- [X] Imutability 
+- [X] Avoiding side effects
 
 # NOTE Always remember to read the docs!!
 [[https://clojuredocs.org/]]
-[[https://clojure.org/reference/reader
-]]
+[[https://clojure.org/reference/reader]]
+[[https://clojure.org/api/cheatsheet]]
+
 * Basics
 Clojures use the REPL system, similar to all lisp dialects.
 
@@ -17,8 +18,10 @@ You can run all basic evaluations here!
 
 ** Emacs integration
 You should use "cider" to use the REPL inside of Emacs for fast evaluation and docs.
+
 ** File ending
 Files for clojure end in .clj!!
+
 ** Comments
 ;;
 or
@@ -28,9 +31,14 @@ or
 You can make code more readable by denesting using the --> macro.
 
 #+BEGIN_SRC clojure
-    (reduce + (map inc (range 10)))
-    --> (range 10) (map inc) (reduce +)
-    ;; both will give the same result!
+  (reduce + (map inc (range 10)))
+
+  (->> (range 10)
+       (map inc)
+       (reduce +))
+
+  ;; both will give the same result!
+  ;; second version with the macro will be more readable (top-down logic)
 #+END_SRC
 
 * Primitive Types
@@ -38,14 +46,17 @@ Mostly the same primitive types from the java lang!!
 
 ** Clojure specific
 nil -> no value
-'SOMETHING -> does not evaluate the SOMETHING
+'something -> symbol, not evaluated
 
 ** def
 This defines var for a global scope!
+
 (def x "abc")
+
 # NOTE to define a single character, use the \
 
 ** let
+
 This defines var for a local scope! Use it to define vars inside functions (good practice)!
 (let x "abc")
 
@@ -60,49 +71,65 @@ Clojure has polymorphism!!
 They are all collections, but only lists are sequences.
 All functions work for all of them!!
 
-
-(conj list elem)
-(first list)
-(last list)
-(rest list)
-(second list)
-(get list position/key)
-...
+#+BEGIN_SRC clojure
+  (conj list elem)
+  (first list)
+  (last list)
+  (rest list)
+  (second list)
+  (get list position/key)
+  ;; ...
+#+END_SRC
 
 ** Vector
 List type that is indexed, works as a queue.
 
-(vector 1 2 3)
-[1 2 3]
+#+BEGIN_SRC clojure
+  (vector 1 2 3)
+  ;;or [1 2 3]
+#+END_SRC
 
 ** List
 List type that is the basic lisp list, works as a stack.
 
-(list 1 2 3)
-'(1 2 3)
+#+BEGIN_SRC clojure
+  (list 1 2 3)
+  ;;or
+  '(1 2 3)
+#+END_SRC
+
 # NOTE be careful about the ', otherwise it would evaluate the first element as a function.
 
 ** Set
 List type that can't have repeated elements
 
-(set [1 2 3 3])
-# NOTE this will turn the vector into a 3 element set without repetition.
-#{1 2 3}
+#+BEGIN_SRC clojure
+  (set [1 2 3 3])
+  ;;or
+  #{1 2 3}
+#+END_SRC
 
 ** Hash-map
 Just like a dictionary in python, key and value pairs.
 
-(hash-map :a 1 :b 2 :c 3)
-{:a 1, :b 2}
-(hash-map :a [1 2 {:b 2}]) <-- complex stuff like this is possible!
+#+BEGIN_SRC clojure
+  (hash-map :a 1 :b 2 :c 3)
+  ;;or
+  {:a 1, :b 2}
+  (hash-map :a [1 2 {:b 2}]) ;; nested stuff like this is possible!
+#+END_SRC
+
 # NOTE commas are ALWAYS ignored in clojure
 
 *** Functions for Hash-maps
-(get map :key) --> get value for key
-(get-in map [:nested-key :key] --> same as (get (get map :nested-key) :key)
-(assoc map :new-key new-value) --> add key
-(assoc-in ...) --> add key nested
-(dissoc map :key) --> remove key
+
+#+BEGIN_SRC clojure
+  (get map :key) --> get value for key
+  (get-in map [:nested-key :key]) --> same as (get (get map :nested-key) :key)
+  (assoc map :new-key new-value) --> add key
+  (assoc-in ...) --> add key nested
+  (dissoc map :key) --> remove key
+#+END_SRC
 
 * Functions
 ** Anonymous function
@@ -144,9 +171,9 @@ For any amount of arguments... (rest)
 
 *** Naming conventions
 
-'name? --> for boolean functions
-'a->b --> for transformation functions
-'name! --> non-pure functions w/ side affects
+name? --> for boolean functions
+a->b --> for transformation functions
+name! --> non-pure functions that cause mutability
 
 * Control flow
 ** If conditional
