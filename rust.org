@@ -552,7 +552,139 @@ Enums can be used with match to look for patterns.
   }
 #+end_src
 
+TODO: Other stuff about this. Using if ... let is useful when you only want to match to a single possibility and ignore the rest.
 
+#+begin_src rust
+  let a = Some(5);
 
+  if let Some(b) = a {
+      println!("Lalala!");
+  }
 
+  // The above code is the same as
+  match a {
+      Some(b) => println!("Lalala!"),
+      _ => (),
+  }
+#+end_src
 
+* Common Collections
+
+These are very common collections in Rust.
+
+** Vector
+To create a vector you use the Vec<T> for type and Vec::new() construction. Done on the heap.
+
+#+begin_src rust
+  let v: Vec<i32> = Vec::new();
+
+  // i32 is the default integer type
+  // Macro creates a vector of Vec<i32> type
+  let v2 = vec![1, 2, 3];
+
+  // You can use the push() method to push values to a vector
+  let mut v3 = Vec::new();
+  v3.push(4);
+  v3.push(5);
+
+  // You can use the get() method to acess a value from a vector
+  let v4 = vec![1, 2, 3];
+  let third: Option<&i32> = v.get(2); // type &i32 because it is a slice of the vector
+
+  match third {
+      Some(third) => println!("There is a third element: {third}");
+      None => println!("No third element on the vector.");
+  } // get() will return None when outside of bounds
+
+  // Iterating over the values of a vector
+  let v5 = vec![1, 2, 3, 4, 5];
+  for i in &v5 {
+      println!("{i}");
+  }
+
+  // To change a value of a reference we must use the * dereference operator
+  let mut mut_v = vec![10, 20, 30];
+  for i in &mut mut_v {
+      ,*i += 50;
+  }
+
+  // You can use Enums together with vector if you want a variety of types
+   enum SpreadsheetCell {
+        Int(i32),
+        Float(f64),
+        Text(String),
+    }
+
+    let row = vec![
+        SpreadsheetCell::Int(3),
+        SpreadsheetCell::Text(String::from("blue")),
+        SpreadsheetCell::Float(10.12),
+    ];
+#+end_src
+
+** String
+
+String were touched a bit before.
+
+#+begin_src rust
+  let mut s = String::new();
+
+  // You can turn a literal into a String
+  let s = "lalala".to_string();
+  let s = String::from("lalala");
+
+  // Strings are UTF-8 encoded
+  let hello = String::from("你好");
+
+  // You can grow a String with the push_str() method
+  // push() adds a single character
+  let mut s1 = String::from("foo");
+  s1.push_str("bar");
+  s1.push('a');
+
+  // You can concatenate Strings with the + operator
+  let a = String::from("lalala");
+  let b = String::from("lololo");
+  let c = String::from("lelele");
+
+  let new_concat = a + "-" + &b + "-" + &c; // a was moved
+
+  // You can do the same with format! macro
+  let new_concat = format!("{a}-{b}-{c}");
+
+  // You can iterate over a String
+  for c in "abcdefg".chars() { // chars that make up the String
+      println!("{c}");
+  }
+
+  for b in "abcdefg".bytes() { // bytes that make up the String
+      println!("{b}");
+  }
+#+end_src
+
+** Hash Map
+
+A Hash Map is all about having a key and a value associated with each key.
+
+#+begin_src rust
+  use std::collections::HashMap;
+
+  let mut scores = HashMap::new();
+
+  scores.insert(String::from("Blue"), 10);
+  scores.insert(String::from("Red"), 40);
+
+  // Acessing values from the Hash Map
+  let team_name = String::from("Blue");
+  let blue_score = scores
+      .get(&team_name) // returns an Option<&V>
+      .copied() // Turn the Option<&i32> into Option<i32>
+      .unwrap_or(0); // Sets score to 0 if the key doesn't have an entry
+
+  // You can also iterate over a Hash Map
+  for (k, v) in &scores {
+      // -->o-- snip -->o--
+  }
+#+end_src
+
+* TODO Error Handling
