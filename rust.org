@@ -688,3 +688,38 @@ A Hash Map is all about having a key and a value associated with each key.
 #+end_src
 
 * TODO Error Handling
+Rust makes a important distinction between recoverable errors and unrecoverable errors! It does not have exceptions. The *Result<T, E>* is used for recoverable errors, and the *panic!* macro for unrecoverable errors.
+
+#+begin_src rust
+    // Panic will simply abort the program imediatly
+    panic!("Abort! Abort mission!");
+
+    // The Result enum, for the case of recoverable errors, has two variants]
+    enum Result<T, E> { // As defined in the standard
+        Ok(T),
+        Err(E),
+    }
+
+    use std::fs::File;
+
+    let a_file_result = File::open("test.txt"); // This will return a Result
+    let a_file = match a_file_result {
+        Ok(file) => file,
+        // You can match for different error types
+        Err(error) => match error.kind() {
+    	ErrorKind::NotFound => match File::create("test.txt") {
+    	    Ok(fc) => fc,
+    	    Err(e) => panic!("Couldn't create: {e:?}"),
+    	},
+    	_ => {
+    	    panic!("Problem opening file: {error:?}");
+    	},
+        }
+
+        // The unwrap() method is a shortcut for a panic!
+        let another_file = File::open("test2.txt").unwrap();
+
+        // The expect() method is useful for providing better error messages
+        let another_file = File::open("test2.txt")
+  	  .expect("File should exist!");
+#+end_src
