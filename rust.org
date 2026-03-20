@@ -1,0 +1,293 @@
+#+title: RUST DOC FOR MYSELF
+
+* Basic setup
+Use cargo! Cargo is the package manager for Rust. You can install the rustup package on their official [[https://rust-lang.org/pt-BR/learn/get-started/][website]].
+
+#+begin_src bash
+  cargo new proj-name
+  cargo build
+  cargo run
+#+end_src
+
+* Variables
+Variables are imutable by default in Rust.
+
+#+begin_src rust
+  fn main() {
+      
+      // x is imutable
+      let x = 10;
+      
+      // This would return an error
+      x = x + 2; 
+
+      // y is mutable
+      let mut y = 5;
+
+      // This is ok, since y is mutable
+      y = y + 2;
+  }
+#+end_src
+
+** Constants
+These are not only imutable by default, they are *always* imutable. You can't turn a const mutable.
+
+#+begin_src rust
+  fn main() {
+      // There's no "const mut" in Rust
+      const PI = 3.1415; 
+  }
+#+end_src
+
+** Shadowing
+You can overshadow the name of another variable. This means the new variable will take the name to itself until the end of the scope. This allows "mutation" of type, since we are creating a brand new variable. Mutability does not allow this.
+
+#+begin_src rust
+  fn main() {
+      
+      // imutable x
+      let x = 10;
+      
+      // x value is overshadowed by the new x value below
+      let x = x + 1;
+      
+  } // => x = 11
+#+end_src
+
+** Primitive Data types
+- Integers :: can be signed or unsigned, varies in size.
+  + i8, u8, i32, u32 etc
+  + usize and isize are architecture-dependent
+- Number literals :: if you want to write down hex, binary etc.
+  + hex => 0xff
+  + octal => 0o77
+  + binary => 0b101001
+  + byte => b'A'
+- Floats :: for floating point values.
+  + f64, f32
+- Boolean :: binary logic.
+  + bool
+  + keywords => "true" and "false"
+- Char :: single quotes.
+  + char
+- Tuple :: compound type of integers, can vary in size for each element.
+  + (u32, u8, f32), for example
+  + You can access the values in the tuple by var_name.index (from 0)
+- Array :: all elements must have the same size, fixed length.
+  + let a: [i32; 5] = [1, 2, 3, 4, 5]
+  + acessing the array a[index]
+
+* Functions
+Defining functions is done with the *fn* keyword, followed by name, arguments and return type.
+
+#+begin_src rust
+  fn function_name(arg: Type) -> Type{
+      // Instructions go here
+      // Return value (expressions) can't have semi-colon
+  }
+#+end_src
+
+* Control flow
+If statements can be inside of variables. The rest is similar to C-like languages.
+
+#+begin_src rust
+  // Both result must have compatible types.
+  let x = if condition { 6 } else { 7 };
+#+end_src
+
+You should use the *match* keyword for control flow with many possibilities.
+
+#+begin_src rust
+  fn main() {
+      
+      let a = 10;
+      
+      match a {
+  	// You can match a single number
+  	1 => 10,
+  	// You can match multiple numbers
+  	2 | 3 | 4 => 20,
+  	// You can match in a range
+  	13..=20 => 0,
+  	// Default value
+  	_ => 1,
+      }
+
+      // You can also assign match to a variable
+      let boolean = true;
+      
+      let binary = match boolean {
+  	false => 0,
+  	true => 1,
+      };
+  }
+#+end_src
+
+** Loops
+The *loop* keyword is useful for looping. You can use the *break* keyword to stop a loop and label them.
+
+#+begin_src rust
+  // -->o-- snip -->o--
+  let mut a = 0;
+
+  'my_loop_label: loop {
+      if a == 9 {
+  	break 'my_loop_label;
+      }
+
+      a += 1;
+  }
+#+end_src
+
+You can also use the *while* keyword.
+
+#+begin_src rust
+  let mut a = 1;
+
+  while a != 10 {
+      number += 1;
+  }
+#+end_src
+
+To iterate through a collection, the *for* keyword is better.
+
+
+#+begin_src rust
+  let arr = [1, 2, 3, 4, 5];
+
+  for element in arr {
+      println!("the value is: {element}");
+  }
+
+  // You can use a range
+  for n in (1..10) { 
+      // -->o--
+  }
+
+  // You can reverse the range with rev()
+  for n2 in (1..10).rev() { 
+      // -->o--
+  }
+#+end_src
+
+* Ownership
+Ownership is Rust's must unique and important feature to understand. This is what garantees memory safety without the need for a garbage collector.
+
+** The Rules
+- All values have an *owner*;
+- There can only be *one* owner at a time;
+- When the owner goes out of scope, the value is dropped.
+
+*** The Variable Scope
+The scope of a variable is how long it will exist in the program runtime. Variables will exist inside of the scope of brackets in which they were defined. After that, they are no longer valid.
+
+#+begin_src rust
+  {
+      let a = 0; // a is valid from here on
+
+  } // a is no longer valid
+#+end_src
+
+When variables need allocation, that is, are not done on the stack but on the heap, Rust uses the RAII principle, similar to C++.
+
+#+begin_src rust
+  {
+    let s = String::from("Hiii!"); // s is valid from here on, memory is allocated
+
+  } // s is no longer valid, memory is dropped automatically
+#+end_src
+
+When you bind a allocated variable to another, Rust will consider it no longer valid. This is used to avoid *double free* error.
+
+#+begin_src rust
+  {
+     let s1 = String::from("UwU");
+     let s2 = s1; // s1 is no longer valid here, only s2 exists.
+
+  } // s2 goes out of scope, memory is freed
+#+end_src
+
+Assigning a new value to a variable will also free it.
+
+#+begin_src rust
+  {
+     let mut s1 = String::from("Lalala!");
+     s1 = String::from("Lololo!"); // original s1 is dropped, only the new s1 remains
+
+  } // s1 goes out of scope 
+#+end_src
+
+If it is necessary to actually deeply copy heap data, we should use the *clone* method.
+
+#+begin_src rust
+  {
+      let s1 = String::from("String");
+      let s2 = s1.clone();
+      // both s1 and s2 are valid and store the string
+
+  } // s1 and s2 go out of scope
+#+end_src
+
+Primitive types (allocated on the stack) implement the *Copy* trait, so they are allowed to create copies of themselves.
+
+*** Ownership and Functions
+Values that are moved to functions, when on the heap, are no longer valid on the specific scope. If those values implement the Copy trait, they will remain valid until the end of the scope.
+
+#+begin_src rust
+  fn main() {
+      let s = String::from("Rust is cool");
+      
+      take_ownership_function(s); // s moves into the function, no longer valid in this scope
+
+      let x = 5;
+
+      copy_function(x); // since i32 implements Copy, the value does not move, x is still valid in this scope
+  } // x goes out of scope, nothing special happens to s since it was moved
+
+  fn take_ownership_function(my_string: String) {
+      // -->o-- snip 
+  } // my_string goes out of scope, which held s's data, and is freed
+
+  fn copy_function(my_int: i32) {
+      // -->o-- snip
+  } // my_int goes out of scope, nothing special
+#+end_src
+
+Returning a value can give ownership.
+
+#+begin_src rust
+  fn main() {
+      let s1 = give_ownership_func();
+
+      let s2 = String::from("Test");
+
+      let s3 = take_and_give_back_func(s2); // s2 was moved
+  } // s1 and s3 goes out of scope, s2 was moved, nothing special
+
+  fn give_ownership_func() -> String {
+      let my_string = String::from("Lalala");
+
+      my_string // ownership goes to the variable s1 calling the function
+  }
+
+  fn take_and_give_back_func(a_string: String) -> String { 
+      a_string // ownership goes to the function than goes to s3 that calls it
+  }
+#+end_src
+
+*NOTE*: You can return multiple values in Rust using a tuple!
+
+#+begin_src rust
+  fn example_function(..args..) -> (..type.., ..type..) {
+      // -->o-- snip
+
+      (value_1, value_2)
+  }
+#+end_src
+
+*** References and Borrowing
+
+
+
+
+

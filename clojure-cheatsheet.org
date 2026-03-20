@@ -16,4 +16,5 @@
   + (def object-name (Record-name. ..fields input..)) :: defines an object of said struct
   + (:label-of-field object-name) :: returns the field value for said object
 - (case value ..cases and returns.. ..default..) :: tests cases, defaults to return with no check
-- 
+- (cycle coll) :: returns lazy sequence of repetitions of the items of coll
+- (reductions f coll) :: different from reduce, returns a *list* with the step-by-step reduction, item-per-item
