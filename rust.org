@@ -382,7 +382,7 @@ It is possible to build functions to create instances of a struct.
       }
   }
 
-  let cat_katty(true, String::from("Katty"), 4);
+  let cat_katty = build_animal(true, String::from("Katty"), 4);
 
   // You can reuse values of another instance of a struct with this syntax
   // This will cause the values of the other instance to be moved and so the original
@@ -486,6 +486,7 @@ Enums can be used with match to look for patterns.
       }
   }
 #+end_src
+
 
 
 
