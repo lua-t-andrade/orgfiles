@@ -151,7 +151,6 @@ You can also use the *while* keyword.
 
 To iterate through a collection, the *for* keyword is better.
 
-
 #+begin_src rust
   let arr = [1, 2, 3, 4, 5];
 
@@ -287,6 +286,206 @@ Returning a value can give ownership.
 
 *** References and Borrowing
 
+References are *like* pointers to a value that is owned by another variable. References always point to a valid value for the life of the reference. Using references, you don't take ownership of the value! This is called borrowing. Unlike pointers, it is not possible to have dangling references (compiler will complain).
+#+begin_src rust
+  fn main() {
+      let s1 = String::from("Hi");
+
+      let len = calc_length(&s1); // the & operator passes a reference to s1
+      // s1 is still valid!
+
+      println!("String: '{s1}', Size: {len}".);
+  } // s1 and len goes out of scope
+
+  fn calc_length(s: &String) -> usize { // Notice the type is followed by the & operator
+      s.len()
+  }
+#+end_src
+
+To modify a borrowed value, we must use the *&mut* keyword in the reference.
+
+#+begin_src rust
+  fn main() {
+      // Assigning a mutable variable
+      let mut s = String::from("I watched you change...");
+
+      change(&mut s); // We use &mut to borrow and be allowed to modify the value!
+  }
+
+  fn change(a_string: &mut String) { // Remember the keyword!
+      a_string.push_str(" into a fly!");
+  }
+#+end_src
+
+*IMPORTANT!* If you do a mutable reference, you can only do it ONCE! You cannot do a mutable borrow on a value that had an imutable borrow that was not yet used!
+
+- Rules of references :: basic rules you should remember
+  + You can have either ONE mutable reference or any number of immutable references;
+  + References must always be valid.
+
+*** Slice
+Slices are a type of *reference* (so, no ownership) to a sequence of elements in a collection, similar to Go slices.
+
+#+begin_src rust
+  let s = String::from("Hello world");
+
+  // Slices are a piece of the original collection
+  // Range can be any
+  let hello = &s[0..5];
+
+  // Slices can also be of the entire collection
+  let all = &s[..];
+
+  // It can be of any type of collection
+  let arr = [1, 2, 3, 4, 5];
+
+  let slice_arr = &arr[..2];
+#+end_src
+
+*NOTE*: String literals (not using the *String::from()* method) are just slices!
+
+* Structs
+For creating custom data types! Just like in C.
+
+#+begin_src rust
+  struct Animal {
+      alive: bool,
+      name: String,
+      kg: u32,
+  }
+
+  // The instance of a struct can be mutable!
+  // But the whole instance will have to be mutable, Rust does not allow
+  // for specific fields to be set as mutable or immutable
+  let cat = Animal { 
+      alive: true,
+      name: String::from("Katty"),
+      kg: 5,
+  };
+#+end_src
+
+It is possible to build functions to create instances of a struct.
+
+#+begin_src rust
+  struct Animal {
+      alive: bool,
+      name: String,
+      kg: u32,
+  }
+
+  fn build_animal(alive: bool, name: String, kg: u32) -> Animal {
+      Animal {
+     	// These are short hands for not repeating arg_field:field each time
+     	alive,
+     	name,
+     	kg,
+      }
+  }
+
+  let cat_katty(true, String::from("Katty"), 4);
+
+  // You can reuse values of another instance of a struct with this syntax
+  // This will cause the values of the other instance to be moved and so the original
+  // instance can't be used
+  let dog_katty = Animal {
+      alive: false,
+      ..cat_katty // The last fields will be the same as the cat_katty instance
+  }
+#+end_src
+
+You can also use tuples to create new types!
+
+#+begin_src rust
+  struct Color(i32, i32, i32);
+  struct 2DPoint(i32, i32);
+
+  let black = Color(0, 0, 0);
+  let origin = 2DPoint(0, 0);
+#+end_src
+
+*NOTE*: You can create Unit-like structs, structs with no fields. Simply do struct NameOfStruct.
+
+** Associated functions
+Methods are the associated functions that take the struct as input. Any associated function that is not a method is used for constructors generally.
+
+#+begin_src rust
+  struct Rectangle {
+      w: u32,
+      h: u32,
+  }
+
+  impl Rectangle {
+      // This is a method
+      fn area(&self) -> u32 { // &self is short for self: &self
+  	self.w * self.h
+      }
+
+      // You can do non methods (associated functions)
+      fn square(size: u32) -> Self {// Self will return struct of type Rectangle
+  	Self {
+  	    w: size,
+  	    h: size,
+  	}
+      }
+  }
+
+  fn main() {
+      let r = Rectangle {
+  	w: 10,
+  	h: 20,
+      };
+
+      let sq = Rectangle::square(5); // To call an associated function we use the :: syntax
+
+      r.area(); // Returns the area using the method of the struct
+      sq.area(); // Square is a type of Rectangle, so the methods are still valid for it
+  }
+#+end_src
+
+* TODO: Enums
+For stablishing the set of possible values.
+
+#+begin_src rust
+  enum Pets {
+      DOG,
+      CAT,
+      RABBIT,
+  }
+
+  // TODO: enum can do more complex stuff
+#+end_src
+
+An very important enum in Rust is the *Option enum*! Feature for dealing with possible null values.
+
+#+begin_src rust
+  enum Option<T> {
+      None,
+      Some(T),
+  }
+
+  // TODO: tell some more about the Option enum
+#+end_src
+
+Enums can be used with match to look for patterns.
+
+#+begin_src rust
+  // Example from the Rust book
+  enum Coin {
+      Penny,
+      Nickel,
+      Dime,
+      Quarter,
+  }
+
+  fn value_in_cents(coin: Coin) -> u8 {
+      match coin {
+          Coin::Penny => 1,
+          Coin::Nickel => 5,
+          Coin::Dime => 10,
+          Coin::Quarter => 25,
+      }
+  }
+#+end_src
 
 
 
