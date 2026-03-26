@@ -1,0 +1,154 @@
+#+title: SCALA DOC
+
+* Intro
+This is a compilation of some specific information on the Scala programming language. This doc will not touch on everything.
+
+* Object-Oriented Programming
+
+The Scala basic Object-Oriented programming idea:
+
+| Traits          | T1, T2, T3        |
+| Composed traits | S1 extends T1, T2 |
+| Classes         | C extends S1, T3  |
+| Instances       | C()               |
+
+You should avoid using classes in Scala, they should be the leafs of your inheritance model.
+
+** Traits
+
+*Traits* define *abstract interfaces*, but can also do *concrete* implementations. The primary tool of decomposition is traits, not classes. Traits in Scala 3 can also take parameters.
+
+#+begin_src scala
+  trait Showable:
+    def show: String // abstract
+    def showHtml = "<p>" + show + "</p>" // concrete
+#+end_src
+
+- Abstract members :: *required* services, need to be implemented by a subclass
+- Concrete members :: *provided* services
+
+#+begin_src scala
+  class Document(txt: String) extends Showable:
+    def show = text // actual implementation in subclass
+#+end_src
+
+*Abstract members* can be *methods*, *value definitions*, *type members* and *givens*.
+
+** Mixin composition
+
+You can compose two services, independently defined, by extending them. This will automatically match abstract members with the concrete members of one another.
+
+#+begin_src scala
+  trait GreetingService:
+    def translate(text: String): String
+    def sayHello = translate("Hello")
+
+  trait TranslationService:
+    def translate(text: String): String = "..."
+
+  // This *extends* will match the abstract translate with the concrete trsanslate
+  trait ComposedService extends GreetingService, TranslationService 
+#+end_src
+
+Of course, it will work with any type of abstract member, not only methods.
+
+** Classes
+
+You should use *classes* to create *instances of the traits*. You should avoid using classes. They can extend multiple traits (but only one super class)
+
+#+begin_src scala
+  class MyService(name: String) extends ComposedService, Showable:
+    def show = s"$name says $sayHello"
+#+end_src
+
+You can create an instance of the class like a variable definition.
+
+#+begin_src scala
+  val s1: MyService = MyService("string")
+#+end_src
+
+Through *subtyping*, you can reuse the instance where extended traits is expected.
+
+#+begin_src scala
+  val s2: Showable = s1
+  // ... etc ...
+#+end_src
+
+Extending non-abstract classes in other files is restricted. To allow it, use the *open* keyword.
+
+#+begin_src scala
+  open class Person(name: String)
+#+end_src
+
+** Instances and Private Mutable State
+
+As in other OOP languages, traits and classes can define mutable fields.
+
+#+begin_src scala
+  class Counter:
+    private var currentCount = 0
+
+    def tick(): Unit = currentCount += 1
+    def count: Int = currentCount
+#+end_src
+
+By definition all members are public. You have to define members to be *private* or *protected*.
+- Private members :: only visible by the class/trait itself and its objects
+- Protected members :: also visible to subclasses of the class
+
+** Singleton Objects
+
+The *object* keyword creates a Singleton object. It defines a class that has exactly one instance.
+
+#+begin_src scala
+  object StringUtils:
+    def isNullOrEmpty(s: String): Boolean = s == null || s.trim.isEmpty
+    def leftTrim(s: String): String = s.replaceAll("^\\s+", "")
+    def rightTrim(s: String): String = s.replaceAll("\\s+$", "")
+
+  val x = StringUtils.isNullOrEmpty("")
+#+end_src
+
+You can create companion objects by giving them the same name as the class. 
+
+#+begin_src scala
+  class Circle(radius: Double):
+    import Circle.* // <--
+    def area: Double = calculateArea(radius)
+
+  object Circle:
+    private def calculateArea(radius: Double): Double =
+      Pi * pow(radius, 2.0)
+
+  val circle1 = Circle(5.0)
+  circle1.area
+#+end_src
+
+You can create modules of traits using objects.
+
+#+begin_src scala
+  trait AddService:
+    def add(a: Int, b: Int) = a + b
+
+  trait MultiplyService:
+    def multiply(a: Int, b: Int) = a * b
+
+  // implement those traits as a concrete object
+  object MathService extends AddService, MultiplyService
+
+  // use the object
+  import MathService.* // <--- !
+  println(add(1,1))        
+  println(multiply(2,2))   
+#+end_src
+
+* Collections
+
+All collections can be both immutable and mutable forms.
+
+** TODO List
+** TODO Tuples
+
+* TODO Service Oriented Design
+
+
