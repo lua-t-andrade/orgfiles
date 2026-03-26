@@ -687,7 +687,7 @@ A Hash Map is all about having a key and a value associated with each key.
   }
 #+end_src
 
-* TODO Error Handling
+* Error Handling
 Rust makes a important distinction between recoverable errors and unrecoverable errors! It does not have exceptions. The *Result<T, E>* is used for recoverable errors, and the *panic!* macro for unrecoverable errors.
 
 #+begin_src rust
@@ -723,3 +723,83 @@ Rust makes a important distinction between recoverable errors and unrecoverable 
         let another_file = File::open("test2.txt")
   	  .expect("File should exist!");
 #+end_src
+
+A shortcut for returning results is using the ? operator.
+
+#+begin_src rust
+  fn read_username_from_file() -> Result<String, io::Error> {
+      let mut username_file = File::open("hello.txt")?;
+      let mut username = String::new();
+      username_file.read_to_string(&mut username)?;
+      Ok(username)
+  }
+
+  // It's possible to chain the methods even with the ? operator
+  // -- >o -- snip --
+      File::open("hello.txt")?.read_to_string(&mut username)?;
+#+end_src
+
+* Generic Types, Traits and Lifetimes
+
+** Generics
+
+Generic types are useful to create code that doesn't repeat itself.
+
+#+begin_src rust
+  // We can define a generic function with the following structure
+  fn my_function<T>(arg: &[T]) -> &T { // can be a slice or not
+      // --->o--- snip
+  }
+  
+  // "T" here works as a placeholder, as in of a generic type T
+  // It could be any capitalized character
+#+end_src
+
+Structs can also have generic types.
+
+#+begin_src rust
+  struct Point<T> {
+      x: T,
+      y: T,
+  } // Only allows the same type T (i.e., only integers, only floats etc)
+
+  // In the case of variability in the types, we should use more generics like so
+  struct Point<T, U> {
+      x: T,
+      y: U,
+  } // That way we can define a variable of type Point with floats and integers at the same time
+#+end_src
+
+Enums can also have generic types.
+
+#+begin_src rust
+  // The Option enum, as defined in the standard
+  enum Option<T> {
+      Some(T),
+      None,
+  }
+
+  // The Result enum, as defined in the standard
+  enum Result<T, E> {
+      Ok(T),
+      Err(E),
+  }
+#+end_src
+
+Methods of structs can also have generics
+
+#+begin_src rust
+  struct Point<T> {
+      x: T,
+      y: T,
+  }
+
+  impl<T> Point<T> { // the impl keyword should be followed by the <T>
+     // --->o--- snip
+  }
+#+end_src
+
+*NOTE*: Generics pay no runtime cost, since the specific definitions needed are created by the compiler in code.
+
+** TODO Traits
+
