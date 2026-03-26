@@ -142,12 +142,23 @@ You can create modules of traits using objects.
   println(multiply(2,2))   
 #+end_src
 
-* Collections
+* TODO Collections
 
 All collections can be both immutable and mutable forms.
 
-** TODO List
-** TODO Tuples
+** Major trait: Iterable
+
+** Trait Seq, subtraits LinearSeq and IndexedSeq
+
+** Class Set
+
+** Class Map
+
+** Concrete Sequences
+
+*** Imutable
+
+*** Mutable
 
 * TODO Service Oriented Design
 
