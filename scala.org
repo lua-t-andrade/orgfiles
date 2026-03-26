@@ -142,23 +142,101 @@ You can create modules of traits using objects.
   println(multiply(2,2))   
 #+end_src
 
-* TODO Collections
+* Collections
 
-All collections can be both immutable and mutable forms.
+All collections can be both immutable and mutable.
 
 ** Major trait: Iterable
 
+This is at the top of the collection hierarchy. All types that are *Iterable* implement the iterator method, yielding a collection's elements one by one.
+
+#+begin_src scala
+  // All collections with this trait defines this method
+  def iterator: Iterator[A]
+#+end_src
+
+The *Iterable* trait also implements some concrete methods.
+
+| Addition                 | concat                                                                                                |
+| Map                      | map, flatMap, collect                                                                                 |
+| Conversion               | to, toList, toVector, toMap, toSet, toSeq, toIndexedSeq, toBuffer, toArray (and the mutable versions) |
+| Copying                  | copyToArray                                                                                           |
+| Size Info                | isEmpty, nonEmpty, size, knownSize, sizeIs                                                            |
+| Element retrieval        | head, last, headOption, lastOption, and find                                                          |
+| Sub-collection retrieval | tail, init, slice, take, drop, takeWhile, dropWhile, filter, filterNot, withFilter                    |
+| Sub-division             | splitAt, span, partition, partitionMap, groupBy, groupMap, groupMapReduce                             |
+| Element tests            | exists, forall, count                                                                                 |
+| Folds                    | foldLeft, foldRight, reduceLeft, reduceRight                                                          |
+| Specific Folds           | sum, product, min, max                                                                                |
+| String operations        | mkString, addString                                                                                   |
+| View                     | view                                                                                                  |
+
+There are two other methods, that returns iterators. The methods *grouped* and *sliding*.
+
 ** Trait Seq, subtraits LinearSeq and IndexedSeq
 
-** Class Set
+All *Seq* are collections that are Iterable and have length and index starting at 0.
 
-** Class Map
+| Indexing and length     | apply, isDefinedAt, length, indices, lengthCompare                                              |  
+| Index search operations | indexOf, lastIndexOf, indexOfSlice, lastIndexOfSlice, indexWhere, lastIndexWhere, segmentLength |  
+| Addition operations     | prepended, prependedAll, appended, appendedAll, padTo                                           |   
+| Update operations       | updated, patch                                                                                  |   
+| Sorting operations      | sorted, sortWith, sortBy                                                                        |   
+| Reversal operations     | reverse, reverseIterator                                                                        |   
+| Comparisons             | startsWith, endsWith, contains, containsSlice, corresponds, search                              |  
+| Multiset                | intersect, diff, distinct, distinctBy                                                           |  
+
+For mutable Seq, the *update* method is also provided. Syntax like *seq(idx) = elem* is just short hand for *seq.update(idx, elem)*.
+
+- LinearSeq trait :: LinearSeq have efficient *head* and *last* operations
+- IndexedSeq trait :: IndexedSeq have efficient *apply*, *length* and if mutable *update* methods
+  + Indexed operations added for mutable IndexedSeq: mapInPlace, sortInPlace, sortInPlaceWith, sortInPlaceBy
+
+** Buffers
+
+An important sub-category of mutable sequences is *Buffers*. They allow not only updates of existing elements but also element additions, insertions and removals. Two implementations are ArrayBuffer and ListBuffer.
+
+| Additions   | append, appendAll, prepend, prependAll, insert, insertAll, padToInPlace |
+| Removals    | subtractOne, subtractAll, remove, trimStart, trimEnd, clear             |
+| Replacement | patchInPlace                                                            |
+| Cloning     | clone                                                                   |
+
+** TODO Set
+
+*Set* is an Iterable with no duplicate elements.
+
+** TODO Map
+
+A *Map* is an Iterable consisting of pairs of keys and values (also named mappings or associations).
 
 ** Concrete Sequences
 
 *** Imutable
 
+| Lists            | A List is a finite immutable sequence.                                                                                                                                 |
+| LazyLists        | A LazyList is like a list except that its elements are computed lazily. Because of this, a lazy list can be infinitely long.                                           |
+| ArraySeq         | ArraySeq is a collection type that addresses the inefficiency for random access on lists. ArraySeqs allow accessing any element of the collection in constant time.    |
+| Vectors          | Vector is a collection type that provides good performance for all its operations. Vectors allow accessing any element of the sequence in “effectively” constant time. |
+| Queues           | A Queue is a first-in-first-out sequence.                                                                                                                              |
+| Ranges           | A Range is an ordered sequence of integers that are equally spaced apart.                                                                                              |
+| Red-Black Trees  | Red-black trees are a form of balanced binary tree where some nodes are designated “red” and others designated “black.” TreeSet and TreeMap.                           |
+| BitSets          | A BitSet represents a collection of small integers as the bits of a larger integer.                                                                                    |
+| VectorMaps       | A VectorMap represents a map using both a Vector of keys and a HashMap.                                                                                                |
+| ListMaps         | A ListMap represents a map as a linked list of key-value pairs.                                                                                                        |
+
 *** Mutable
+
+| ArrayBuffer     | An ArrayBuffer holds an array and a size.                                                                                                   |
+| ListBuffer      | A ListBuffer is like an array buffer except that it uses a linked list internally instead of an array.                                      |
+| StringBuilders  | A StringBuilder is useful for building strings                                                                                              |
+| ArrayDeque      | An ArrayDeque is a sequence that supports efficient addition of elements in the front and in the end. It internally uses a resizable array. |
+| Queue           | A Queue is a first-in-first-out sequence.                                                                                                   |
+| Stack           | A stack implements a data structure which allows to store and retrieve objects in a last-in-first-out (LIFO) fashion.                       |
+| ArraySeq        | Array sequences are mutable sequences of fixed size which store their elements internally in an Array[Object].                              |
+| Hash table      | HashMap, HashSet                                                                                                                            |
+| Weak Hash Table | A key and its associated value will disappear from the map if there is no other reference to that key.                                      |
+| Concurrent Maps | Several threads can acess it.                                                                                                               |
+| Bitsets         | A mutable bit of type mutable.BitSet set is just like an immutable one, except that it is modified in place.                                |
 
 * TODO Service Oriented Design
 
