@@ -238,6 +238,29 @@ A *Map* is an Iterable consisting of pairs of keys and values (also named mappin
 | Concurrent Maps | Several threads can acess it.                                                                                                               |
 | Bitsets         | A mutable bit of type mutable.BitSet set is just like an immutable one, except that it is modified in place.                                |
 
+* Option
+
+Options, just like in Rust, can hold Some(A) or None. The idiomatic way to use it is by treating it as a monad.
+
+#+begin_src scala
+  val name: Option[String] = request.getParameter("name")
+  val upper = name.(_.trim).filter(_.length != 0).map(_.toUpperCase)
+  println(upper.getOrElse(""))
+
+  // getOrElse will evaluate, but return alternative value if None
+#+end_src
+
+There are some keywords you can use here.
+
+| isDefined, nonEmpty | true if not empty                                        |
+| isEmpty             | true if empty                                            |
+| orElse              | evaluate and return alternate optional value if empty    |
+| get                 | return value, throw exception if empty                   |
+| fold                | apply function to optinal value, return default if empty |
+| getOrElse           | evaluate, return alternate value if empty                |
+
+You should prefer using the Option monad as a chain of functions over a value, but you can also do pattern matching.
+
 * TODO Service Oriented Design
 
 
