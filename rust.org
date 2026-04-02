@@ -397,10 +397,10 @@ You can also use tuples to create new types!
 
 #+begin_src rust
   struct Color(i32, i32, i32);
-  struct 2DPoint(i32, i32);
+  struct Point2D(i32, i32);
 
   let black = Color(0, 0, 0);
-  let origin = 2DPoint(0, 0);
+  let origin = Point2D(0, 0);
 #+end_src
 
 *NOTE*: You can create Unit-like structs, structs with no fields. Simply do struct NameOfStruct.
@@ -688,7 +688,9 @@ A Hash Map is all about having a key and a value associated with each key.
 #+end_src
 
 * Error Handling
-Rust makes a important distinction between recoverable errors and unrecoverable errors! It does not have exceptions. The *Result<T, E>* is used for recoverable errors, and the *panic!* macro for unrecoverable errors.
+
+Rust makes a important distinction between recoverable errors and unrecoverable errors!
+It does not have exceptions. The *Result<T, E>* is used for recoverable errors, and the *panic!* macro for unrecoverable errors.
 
 #+begin_src rust
     // Panic will simply abort the program imediatly
@@ -811,7 +813,10 @@ You can define a trait with the *trait* keyword. This can be used to define shar
   }
 #+end_src
 
-As you can see, the trait can have method signatures, like abstract methods in OOP. Each type of this trait will have to provide its implementation of that signature. You use the form *impl* NameOfTrait *for* Struct to apply the trait to the struct.
+As you can see, the trait can have method signatures, like abstract methods in OOP.
+Each type of this trait will have to provide its implementation of that signature.
+You use the form *impl* NameOfTrait *for* Struct to apply the trait to the struct.
+
 #+begin_src rust
   impl MyTrait for MyStruct {
       fn method_signature(&self) -> T {
@@ -830,7 +835,8 @@ The method signature can also have default implementations in the Trait.
   }
 #+end_src
 
-To use a Trait as a parameter in an method you can use the *&* keyword. This way, the parameter could be of any type, as long as it implements that specific trait.
+To use a Trait as a parameter in an method you can use the *&* keyword.
+This way, the parameter could be of any type, as long as it implements that specific trait.
 
 #+begin_src rust
   pub fn my_func(a: &impl MyTrait) {
@@ -893,7 +899,7 @@ Lifetimes are a neat way Rust can check for dangling references! The Rust Book c
           let x = 5;        // -+-- 'b  |
           r = &x;           //  |       |
       }                     // -+       |
-      //          |
+                            //          |
       println!("r: {r}");   //          |
   }                         // ---------+
 
@@ -907,7 +913,82 @@ Lifetimes are a neat way Rust can check for dangling references! The Rust Book c
   }                         // ----------+
 #+end_src
 
-Lifetimes are annotated with 'a, 'b etc. The Rust compiler compares the lifetimes of values and their references to check for dangling references. If the reference lifetime is bigger than the value, it is clear: dangling reference.
+Lifetimes are annotated with 'a, 'b etc. The Rust compiler compares the lifetimes of values and their references to check for dangling references.
+If the reference lifetime is bigger than the value, it is clear: dangling reference. That is what we call the Rust's burrow checker.
 
 *** Generic Lifetimes
+
+**** Generic Lifetimes in Function Parameters
+
+Functions which borrow values must determine a generic lifetime parameter. This is needed when the compiler (and yourself) can't determine what a returned reference will be in a specific function.
+
+#+begin_src rust
+  // This here *won't* compile. The compiler won't be able to
+  // determine whether the returned slice reference refers to
+  // x or to y (neither do you!)
+  fn longest(x: &str, y: &str) -> &str { 
+      if x.len() > y.len() { x } else { y }
+  }
+#+end_src
+
+To determine a generic lifetime parameter, you use a *'* followed by an all lowercase name, generally a single letter.
+
+#+begin_src rust
+  // Examples of references with lifetime annotation
+  &'a i32
+  &'a mut u64
+#+end_src
+
+When we want to use the lifetime annotations, we need to make them function signatures.
+
+#+begin_src rust
+  // *This will compile*! What it's saying is
+  // that for some lifetime 'a, the function will take
+  // two parameters, both being string slices that must
+  // live at least as long as lifetime 'a
+  fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+      if x.len() > y.len() { x } else { y }
+  }
+
+  // The generic 'a lifetime substitutes a concrete lifetime where x overlaps y.
+  // 'a will have the concrete lifetime equal to the smaller of the lifetimes of x
+  // and of y
+#+end_src
+
+Thus, we create constraints for the borrow checker. This works like a contract of a function, making analysis by the Rust compiler simpler.
+
+**** Generic Lifetimes in Struct Definitions
+
+Structs can also hold references to values, not only owned types. In this case, we must add lifetime annotation on every reference in the struct's definition.
+
+#+begin_src rust
+  struct MyStructWithReferences<'a> { // We must put the lifetime annotation here
+      a: &'a i32,
+  }
+#+end_src
+
+*NOTE*: Rust has matured enough to have *lifetime elision rules*. These are cases where the compiler itself will understand the code and no lifetimes are needed to be made explicit.
+
+**** Generic Lifetimes in Method Definitions
+
+Methods that *impl* structs with references and lifetimes must have the lifetime annotations. Though, the elision rules might apply for the methods parameters.
+
+#+begin_src rust
+  impl<'a> MyStructWithReferences<'a> { // Remember the annotations here!!
+      // -- snip -->o--
+  }
+#+end_src
+
+*** The Static Lifetime
+
+The *'static* lifetime denotes that an affected reference *can* live for the *entire duration* of the program. Be careful! Using this should never be first choice solution.
+
+#+begin_src rust
+   // All string literals are 'static by default, for example
+   // If we defined it explicitly:
+   let s: &'static str = "I am static.";
+   // This means the string literal is actually located
+   // in the program's binary!
+#+end_src
+
 
