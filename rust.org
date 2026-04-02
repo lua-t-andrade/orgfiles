@@ -622,9 +622,9 @@ To create a vector you use the Vec<T> for type and Vec::new() construction. Done
     ];
 #+end_src
 
-** String
+** Strings
 
-String were touched a bit before.
+Strings were touched a bit before.
 
 #+begin_src rust
   let mut s = String::new();
@@ -801,5 +801,113 @@ Methods of structs can also have generics
 
 *NOTE*: Generics pay no runtime cost, since the specific definitions needed are created by the compiler in code.
 
-** TODO Traits
+** Traits
+
+You can define a trait with the *trait* keyword. This can be used to define shared behavior.
+
+#+begin_src rust
+  pub trait MyTrait {
+      fn method_signature(&self) -> T;
+  }
+#+end_src
+
+As you can see, the trait can have method signatures, like abstract methods in OOP. Each type of this trait will have to provide its implementation of that signature. You use the form *impl* NameOfTrait *for* Struct to apply the trait to the struct.
+#+begin_src rust
+  impl MyTrait for MyStruct {
+      fn method_signature(&self) -> T {
+  	// -- implementation goes here --
+      }
+  }
+#+end_src
+
+The method signature can also have default implementations in the Trait.
+
+#+begin_src rust
+  pub trait MyTrait {
+      fn method_signature(&self) -> T {
+  	// -- some default --
+      }
+  }
+#+end_src
+
+To use a Trait as a parameter in an method you can use the *&* keyword. This way, the parameter could be of any type, as long as it implements that specific trait.
+
+#+begin_src rust
+  pub fn my_func(a: &impl MyTrait) {
+      // -- do something --
+  }
+
+  // You can do the longer version of this like so
+  pub fn my_func<T: MyTrait>(a: &T) {
+      // -- do something --
+  }
+
+  // And works for more parameters
+  pub fn my_func<T: MyTrait>(a: &T, b: &T) {
+      // -- do something --
+  }
+#+end_src
+
+Its possible to have more than one Trait at once. You shoud use the *+* keyword.
+
+#+begin_src rust
+  pub fn my_func(a: &(impl MyTrait + MyOtherTrait)) {
+      // -- do something --
+  }
+
+  // Other version
+  pub fn my_func<T: MyTrait + MyOtherTrait>(a: &T, b: &T) {
+      // -- do something --
+  }
+#+end_src
+
+You can use the *where* keyword to make the code more readable for different generic types with different traits.
+
+#+begin_src rust
+  pub fn my_func<T, U>(t: &T, u: &U) -> A
+  where
+      T: Trait1 + Trait2,
+      U: Trait1 + Trait3,
+  {
+      // -- do something -
+  }
+#+end_src
+
+Return types can also implement traits!
+
+#+begin_src rust
+  fn my_func() -> impl MyTrait {
+      // -- do something --
+  }
+#+end_src
+
+** Lifetimes
+
+Lifetimes are a neat way Rust can check for dangling references! The Rust Book code shows this visually in a very understandable way.
+
+#+begin_src rust
+  fn main() {
+      let r;                // ---------+-- 'a
+                            //          |
+      {                     //          |
+          let x = 5;        // -+-- 'b  |
+          r = &x;           //  |       |
+      }                     // -+       |
+      //          |
+      println!("r: {r}");   //          |
+  }                         // ---------+
+
+  fn main() {
+      let x = 5;            // ----------+-- 'b
+                            //           |
+      let r = &x;           // --+-- 'a  |
+                            //   |       |
+      println!("r: {r}");   //   |       |
+                            // --+       |
+  }                         // ----------+
+#+end_src
+
+Lifetimes are annotated with 'a, 'b etc. The Rust compiler compares the lifetimes of values and their references to check for dangling references. If the reference lifetime is bigger than the value, it is clear: dangling reference.
+
+*** Generic Lifetimes
 
